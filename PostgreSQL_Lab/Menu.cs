@@ -19,18 +19,31 @@ namespace PostgreSQL_Lab
                 "Get by PK",
                 "Exit"
         };
-        private static int index = 0, menuItemsCount = menuItems.Count;
+
+        private static List<string> insertMenuItems = new List<string>() { 
+                "Random",
+                "Insert by me",
+                "Back"
+        };
+
+        private static List<string> tableMenuItems = new List<string>() {
+                "Customer",
+                "Product",
+                "Supplier",
+                "Back"
+        };
+        private static int index = 0;
 
         public Menu(){
-            
             while(true){
             Console.CursorVisible = false;
                 DrawMenu(menuItems);
-                int selectedMenu = SelectedMenu(menuItemsCount);
+                int selectedMenu = SelectedMenu(menuItems.Count);
                 switch (selectedMenu)
                 {
                     case 0:
                         Console.WriteLine("Insert");
+                        tableMenu();
                         break;
                     case 1:
                         Console.WriteLine("Update");
@@ -53,10 +66,6 @@ namespace PostgreSQL_Lab
                         break;
                     case 7:
                         Environment.Exit(0);
-                        break;
-                    
-                    
-                    default:
                         break;
                 }
             }
@@ -98,5 +107,57 @@ namespace PostgreSQL_Lab
             return -1;
         }
         
+        private void InsertMenu(int index){
+            bool existMenu = true;
+            while (existMenu)
+            {
+                Console.CursorVisible = false;
+                DrawMenu(insertMenuItems);
+                int selectedMenu = SelectedMenu(insertMenuItems.Count);
+                switch (selectedMenu)
+                {
+                    case 0:
+                        Console.WriteLine("Random");
+                        Data.InsertRandData(index);
+                        break;
+                    case 1:
+                        Console.WriteLine("Insert by me");
+                        Data.InsertData(index);
+                        break;
+                    case 2:
+                        Console.WriteLine("Back");
+                        existMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private void tableMenu()
+        {
+            bool existMenu = true;
+            while (existMenu)
+            {
+                Console.CursorVisible = false;
+                DrawMenu(tableMenuItems);
+                int selectedMenu = SelectedMenu(tableMenuItems.Count);
+                switch (selectedMenu)
+                {
+                    case 0:
+                        InsertMenu(index);
+                        break;
+                    case 1:
+                        InsertMenu(index);
+                        break;
+                    case 2:
+                        InsertMenu(index);
+                        break;
+                    case 3:
+                        Console.WriteLine("Back");
+                        existMenu = false;
+                        break;
+                }
+            }
+        }
+
     }
 }

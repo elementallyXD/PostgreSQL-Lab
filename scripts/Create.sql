@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS customer (
+  _id SERIAL PRIMARY KEY,
+  fullname VARCHAR(255) NOT NULL,
+  city VARCHAR(255) NOT NULL,
+  contacts VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS supplier (
+  _id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS products (
+  _id SERIAL PRIMARY KEY,
+  designation VARCHAR(255) NOT NULL,
+  description TEXT,
+  avilable boolean NOT NULL,
+  c_id INTEGER NOT NULL REFERENCES customer ON UPDATE CASCADE ON DELETE RESTRICT,
+  s_id INTEGER NOT NULL REFERENCES supplier ON UPDATE CASCADE ON DELETE RESTRICT,
+  tsv tsvector NOT NULL
+);
+
+CREATE INDEX search_idx ON products USING GIN (tsv);
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+ON products FOR EACH ROW EXECUTE PROCEDURE
+tsvector_update_trigger(tsv, 'pg_catalog.english', description);

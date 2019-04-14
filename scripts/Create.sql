@@ -17,12 +17,5 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   avilable boolean NOT NULL,
   c_id INTEGER NOT NULL REFERENCES customer ON UPDATE CASCADE ON DELETE RESTRICT,
-  s_id INTEGER NOT NULL REFERENCES supplier ON UPDATE CASCADE ON DELETE RESTRICT,
-  tsv tsvector NOT NULL
-);
-
-CREATE INDEX search_idx ON products USING GIN (tsv);
-
-CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
-ON products FOR EACH ROW EXECUTE PROCEDURE
-tsvector_update_trigger(tsv, 'pg_catalog.english', description);
+  s_id INTEGER NOT NULL REFERENCES supplier ON UPDATE CASCADE ON DELETE RESTRICT
+)

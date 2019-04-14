@@ -42,44 +42,125 @@ namespace PostgreSQL_Lab
                         Console.Write("\ttitle: " + reader.GetString(1));
                         Console.WriteLine();
                     }
+
+                Console.ForegroundColor = ConsoleColor.Green; // устанавливаем цвет
+                Console.WriteLine("Table Products");
+                Console.ResetColor(); // сбрасываем в стандартный
+                using (var cmd = new NpgsqlCommand("SELECT * FROM products", conn))
+                using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        Console.Write("ID: " + reader.GetValue(0));
+                        Console.Write("\tdesignation: " + reader.GetString(1));
+                        Console.Write("\tdescription: " + reader.GetString(2));
+                        Console.Write("\tailable: " + reader.GetBoolean(3));
+                        Console.Write(" \tC_ID: " + reader.GetValue(4));
+                        Console.Write(" \tS_ID: " + reader.GetValue(5));
+                        Console.WriteLine();
+                    }
                 conn.Close();
             }
             Console.WriteLine("\n\nPress any key...");
             Console.ReadKey();
-            Console.Clear();
+            //Console.Clear();
         }
 
         public static void InsertData(int index){
-            string fullname = "", city = "", contacts = "";
+            string fullname = "", city = "", contacts = "", command = "", description = "";
             int date=0;
-            try
+            bool avilable = false;
+
+            switch (index)
             {
-                Console.Write("Full Name: ");
-                 fullname = Convert.ToString(Console.ReadLine());
-                Console.Write("City: ");
-                city = Convert.ToString(Console.ReadLine());
-                Console.Write("Contacts: ");
-                contacts = Convert.ToString(Console.ReadLine());
-                Console.Write("Date: ");
-                date = Convert.ToInt32(Console.ReadLine());
+                case 0:
+                    try
+                    {
+                        Console.Write("Full Name: ");
+                        fullname = Convert.ToString(Console.ReadLine());
+                        Console.Write("City: ");
+                        city = Convert.ToString(Console.ReadLine());
+                        Console.Write("Contacts: ");
+                        contacts = Convert.ToString(Console.ReadLine());
+                        Console.Write("Date: ");
+                        date = Convert.ToInt32(Console.ReadLine());
+                    }
+                    catch (FormatException f)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(f.Message);
+                        Console.ResetColor();
+                        Console.ReadKey();
+                    }
+                    command = String.Format("INSERT INTO customer (fullname, city, contacts, buydate) VALUES ('{0}','{1}','{2}','{3}')", fullname, city, contacts, date);
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        conn.Open();
+                        using (var cmd = new NpgsqlCommand(command, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        conn.Close();
+                    }
+                    break;
+                case 1:
+                    int c_id = 0, s_id = 0;
+                    try
+                    {
+                        Console.Write("Designation: ");
+                        fullname = Convert.ToString(Console.ReadLine());
+                        Console.Write("Description: ");
+                        description = Convert.ToString(Console.ReadLine());
+                        Console.Write("avilable: ");
+                        avilable = Convert.ToBoolean(Console.ReadLine());
+                        Console.Write("c_id: ");
+                        c_id = Convert.ToInt32(Console.ReadLine());
+                        Console.Write("s_id: ");
+                        s_id = Convert.ToInt32(Console.ReadLine());
+                    }
+                    catch (FormatException f)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(f.Message);
+                        Console.ResetColor();
+                        Console.ReadKey();
+                    }
+                    command = String.Format("INSERT INTO products (designation, description, avilable, c_id, s_id) VALUES ('{0}','{1}','{2}','{3}','{4}')", fullname, description, avilable, c_id, s_id);
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        conn.Open();
+                        using (var cmd = new NpgsqlCommand(command, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        conn.Close();
+                    }
+                    break;
+                case 2:
+                    try
+                    {
+                        Console.Write("Full Name: ");
+                        fullname = Convert.ToString(Console.ReadLine());
+                    }
+                    catch (FormatException f)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(f.Message);
+                        Console.ResetColor();
+                        Console.ReadKey();
+                    }
+                    command = String.Format("INSERT INTO supplier (title) VALUES ('{0}')", fullname);
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        conn.Open();
+                        using (var cmd = new NpgsqlCommand(command, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        conn.Close();
+                    }
+                    break;
             }
-            catch (FormatException f)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(f.Message);
-                Console.ResetColor();
-                Console.ReadKey();
-            }
-            string command = String.Format("INSERT INTO customer (fullname, city, contacts, buydate) VALUES ('{0}','{1}','{2}','{3}')", fullname, city, contacts, date);
-            using (var conn = new NpgsqlConnection(connString))
-            {
-                conn.Open();
-                using (var cmd = new NpgsqlCommand(command, conn))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                conn.Close();
-            }
+            
             
             Console.ForegroundColor = ConsoleColor.Green; // устанавливаем цвет
             Console.WriteLine("Запись добавлена!\n");
@@ -90,9 +171,10 @@ namespace PostgreSQL_Lab
         }
 
         private static Random random = new Random();
+        
         public static string RandomString(int length)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const string chars = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
@@ -114,10 +196,16 @@ namespace PostgreSQL_Lab
         public static string RandomContacts(){
             return "+" + RandomNumbers(12);
         }
-
+        
+        private static bool RandomBool(Random r, int truePercentage = 50)
+        {
+            return r.NextDouble() < truePercentage / 100.0;
+        }
+      
         public static void InsertRandData(int index)
         {
-            string fullname = "", city = "", contacts = "";
+            string fullname = "", city = "", contacts = "", command = "", description = "";
+            bool avilable = false;
             DateTime date;
 
             switch (index)
@@ -125,7 +213,7 @@ namespace PostgreSQL_Lab
                 case 0:
                     for (int i = 0; i < 10; i++)
                     {
-                        string command = String.Format("INSERT INTO customer (fullname, city, contacts, buydate) VALUES ('{0}','{1}','{2}','{3}')", fullname = RandomString(12), city = RandomString(8), contacts = RandomContacts(), date = RandomDay());
+                        command = String.Format("INSERT INTO customer (fullname, city, contacts, buydate) VALUES ('{0}','{1}','{2}','{3}')", fullname = RandomString(12), city = RandomString(8), contacts = RandomContacts(), date = RandomDay());
                         using (var conn = new NpgsqlConnection(connString))
                         {
                             conn.Open();
@@ -138,11 +226,24 @@ namespace PostgreSQL_Lab
                     }
                     break;
                 case 1:
+                    for (int i = 0; i < 5; i++)
+                    {
+                        command = String.Format("INSERT INTO products (designation, description, avilable, c_id, s_id) VALUES ('{0}','{1}','{2}','{3}','{4}')", fullname = RandomString(10), description = RandomString(30), avilable = RandomBool(random, 50), 1, 1);
+                        using (var conn = new NpgsqlConnection(connString))
+                        {
+                            conn.Open();
+                            using (var cmd = new NpgsqlCommand(command, conn))
+                            {
+                                cmd.ExecuteNonQuery();
+                            }
+                            conn.Close();
+                        }
+                    }
                     break;
                 case 2:
                     for (int i = 0; i < 2; i++)
                     {
-                        string command = String.Format("INSERT INTO supplier (title) VALUES ('{0}')", fullname = RandomString(12));
+                        command = String.Format("INSERT INTO supplier (title) VALUES ('{0}')", fullname = RandomString(12));
                         using (var conn = new NpgsqlConnection(connString))
                         {
                             conn.Open();
@@ -159,6 +260,85 @@ namespace PostgreSQL_Lab
 
             Console.ForegroundColor = ConsoleColor.Green; // устанавливаем цвет
             Console.WriteLine("Записи добавлены!\n");
+            Console.ResetColor(); // сбрасываем в стандартный
+            Console.WriteLine("\n\nPress any key...");
+            Console.ReadKey();
+            Console.Clear();
+        }
+
+        public static void UpdateData()        
+        {
+            string tablenames = "", columns = "", conditions = "", command = "";
+            Console.WriteLine("Example: UPDATE table_name SET column1 = value1, column2 = value2, ... WHERE condition; ");
+
+                    try
+                    {
+                        Console.Write("UPDATE ");
+                        tablenames = Convert.ToString(Console.ReadLine());
+                        Console.Write("SET ");
+                        columns = Convert.ToString(Console.ReadLine());
+                        Console.Write("WHERE ");
+                        conditions = Convert.ToString(Console.ReadLine());
+
+                    }
+                    catch (FormatException f)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(f.Message);
+                        Console.ResetColor();
+                        Console.ReadKey();
+                    }
+                    command = String.Format("UPDATE {0} SET {1} WHERE {2}", tablenames, columns, conditions);
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        conn.Open();
+                        using (var cmd = new NpgsqlCommand(command, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        conn.Close();
+                    }
+
+            Console.ForegroundColor = ConsoleColor.Green; // устанавливаем цвет
+            Console.WriteLine("Запись изменена!\n");
+            Console.ResetColor(); // сбрасываем в стандартный
+            Console.WriteLine("\n\nPress any key...");
+            Console.ReadKey();
+            Console.Clear();
+        }
+        
+        public static void DeleteData(){
+            string tablenames = "", conditions = "", command = "";
+            Console.WriteLine("Example: DELETE FROM table_name WHERE condition;");
+
+            try
+            {
+                Console.Write("DELETE FROM ");
+                tablenames = Convert.ToString(Console.ReadLine());
+                Console.Write("WHERE ");
+                conditions = Convert.ToString(Console.ReadLine());
+
+            }
+            catch (FormatException f)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(f.Message);
+                Console.ResetColor();
+                Console.ReadKey();
+            }
+            command = String.Format("DELETE FROM {0} WHERE {1}", tablenames, conditions);
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand(command, conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+
+            Console.ForegroundColor = ConsoleColor.Green; // устанавливаем цвет
+            Console.WriteLine("Запись(cи) удалена!\n");
             Console.ResetColor(); // сбрасываем в стандартный
             Console.WriteLine("\n\nPress any key...");
             Console.ReadKey();

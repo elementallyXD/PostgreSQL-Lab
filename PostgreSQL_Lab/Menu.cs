@@ -46,10 +46,10 @@ namespace PostgreSQL_Lab
                         tableMenu();
                         break;
                     case 1:
-                        Console.WriteLine("Update");
+                        Data.UpdateData();
                         break;
                     case 2:
-                        Console.WriteLine("Delete");
+                        Data.DeleteData();
                         break;
                     case 3:
                         Console.WriteLine("Search");
@@ -131,6 +131,8 @@ namespace PostgreSQL_Lab
                 }
             }
         }
+
+
 
         private void tableMenu()
         {

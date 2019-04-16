@@ -9,7 +9,7 @@ namespace PostgreSQL_Lab
 {
     class Menu
     {
-        private static List<string> menuItems = new List<string>() {
+        private static readonly List<string> menuItems = new List<string>() {
                 "Insert",
                 "Update",
                 "Delete",
@@ -20,16 +20,17 @@ namespace PostgreSQL_Lab
                 "Exit"
         };
 
-        private static List<string> insertMenuItems = new List<string>() { 
+        private static readonly List<string> insertMenuItems = new List<string>() { 
                 "Random",
-                "Insert by me",
+                "Console",
                 "Back"
         };
 
-        private static List<string> tableMenuItems = new List<string>() {
+        private static readonly List<string> tableMenuItems = new List<string>() {
                 "Customer",
                 "Product",
                 "Supplier",
+                "Buyers",
                 "Back"
         };
         private static int index = 0;
@@ -42,8 +43,7 @@ namespace PostgreSQL_Lab
                 switch (selectedMenu)
                 {
                     case 0:
-                        Console.WriteLine("Insert");
-                        tableMenu();
+                        InsertMenu();
                         break;
                     case 1:
                         Data.UpdateData();
@@ -58,11 +58,10 @@ namespace PostgreSQL_Lab
                         Console.WriteLine("Full text search");
                         break;
                     case 5:
-                        Console.WriteLine("Get All");
                         Data.ReturnAll();
                         break;
                     case 6:
-                        Console.WriteLine("Get by PK");
+                        Data.GetByPk();
                         break;
                     case 7:
                         Environment.Exit(0);
@@ -107,7 +106,7 @@ namespace PostgreSQL_Lab
             return -1;
         }
         
-        private void InsertMenu(int index){
+        private void InsertMenu(){
             bool existMenu = true;
             while (existMenu)
             {
@@ -118,11 +117,11 @@ namespace PostgreSQL_Lab
                 {
                     case 0:
                         Console.WriteLine("Random");
-                        Data.InsertRandData(index);
+                        Data.InsertRandData();
                         break;
                     case 1:
-                        Console.WriteLine("Insert by me");
-                        Data.InsertData(index);
+                        Console.WriteLine("Console");
+                        Data.InsertData();
                         break;
                     case 2:
                         Console.WriteLine("Back");
@@ -131,35 +130,5 @@ namespace PostgreSQL_Lab
                 }
             }
         }
-
-
-
-        private void tableMenu()
-        {
-            bool existMenu = true;
-            while (existMenu)
-            {
-                Console.CursorVisible = false;
-                DrawMenu(tableMenuItems);
-                int selectedMenu = SelectedMenu(tableMenuItems.Count);
-                switch (selectedMenu)
-                {
-                    case 0:
-                        InsertMenu(index);
-                        break;
-                    case 1:
-                        InsertMenu(index);
-                        break;
-                    case 2:
-                        InsertMenu(index);
-                        break;
-                    case 3:
-                        Console.WriteLine("Back");
-                        existMenu = false;
-                        break;
-                }
-            }
-        }
-
     }
 }

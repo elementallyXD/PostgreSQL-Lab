@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PostgreSQL_Lab
 {
@@ -29,6 +25,12 @@ namespace PostgreSQL_Lab
         private static readonly List<string> fullSearchItems = new List<string>() {
                 "Word",
                 "Phrase",
+                "Back"
+        };
+
+        private static readonly List<string> attributesSearch = new List<string>() {
+                "Data",
+                "Logical",
                 "Back"
         };
 
@@ -58,7 +60,7 @@ namespace PostgreSQL_Lab
                         Data.DeleteData();
                         break;
                     case 3:
-                        
+                        AttSearchMenu();
                         break;
                     case 4:
                         SearchMenu();
@@ -91,6 +93,31 @@ namespace PostgreSQL_Lab
                         break;
                     case 1:      
                         Data.FullTextSearchPhrase();
+                        break;
+                    case 2:
+                        Console.WriteLine("Back");
+                        existMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private static void AttSearchMenu()
+        {
+            bool existMenu = true;
+            index = 0;
+            while (existMenu)
+            {
+                Console.CursorVisible = false;
+                DrawMenu(attributesSearch);
+                int selectedMenu = SelectedMenu(attributesSearch.Count);
+                switch (selectedMenu)
+                {
+                    case 0:
+                        Data.AttDateSearch();
+                        break;
+                    case 1:
+                        Data.AttBoolSearch();
                         break;
                     case 2:
                         Console.WriteLine("Back");

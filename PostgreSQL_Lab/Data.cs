@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Npgsql;
 
 namespace PostgreSQL_Lab
@@ -378,7 +375,7 @@ namespace PostgreSQL_Lab
         public static void FullTextSearchWord(){
             ReturnAll();
             string text = "", command = "";
-                    Console.WriteLine("Слово не входить:");
+                    Console.WriteLine("Слово не входить");
                     try
                     {
                         Console.Write("Слово: ");
@@ -428,6 +425,79 @@ namespace PostgreSQL_Lab
             }
             text = text.Replace(" ", " <-> ");
             command = String.Format("select products.* FROM products WHERE to_tsvector(products.description) @@ to_tsquery('{0}')", text);
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand(command, conn))
+                using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        Console.Write("ID: " + reader.GetValue(0));
+                        Console.Write("\tdesignation: " + reader.GetString(1));
+                        Console.Write("\tdescription: " + reader.GetString(2));
+                        Console.Write("\tailable: " + reader.GetBoolean(3));
+                        Console.WriteLine();
+                    }
+                conn.Close();
+            }
+        }
+    
+        public static void AttDateSearch(){
+            ReturnAll();
+            string date1 = "", date2 = "", command = "";
+            Console.WriteLine("Діапазон дат");
+            try
+            {
+                Console.Write("Дата 1: ");
+                date1 = Convert.ToString(Console.ReadLine());
+                Console.Write("Дата 2: ");
+                date2 = Convert.ToString(Console.ReadLine());
+            }
+            catch (FormatException f)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(f.Message);
+                Console.ResetColor();
+                Console.ReadKey();
+            }
+
+            command = String.Format("select * from customer where buydate between '{0}' and '{1}'", date1, date2);
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand(command, conn))
+                using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        Console.Write("ID: " + reader.GetValue(0));
+                        Console.Write("\tfullname: " + reader.GetString(1));
+                        Console.Write("\tcity: " + reader.GetString(2));
+                        Console.Write("\tcontacts: " + reader.GetString(3));
+                        Console.Write("\tbuydate: " + reader.GetDate(4));
+                        Console.WriteLine();
+                    }
+                conn.Close();
+            }
+        }
+
+        public static void AttBoolSearch(){
+            ReturnAll();
+            string text = "", command = "";
+            Console.WriteLine("Логичний тип");
+            try
+            {
+                Console.Write("Тип: ");
+                text = Convert.ToString(Console.ReadLine());
+            }
+            catch (FormatException f)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(f.Message);
+                Console.ResetColor();
+                Console.ReadKey();
+            }
+
+            command = String.Format("select * from products where avilable = '{0}'", text);
             using (var conn = new NpgsqlConnection(connString))
             {
                 conn.Open();

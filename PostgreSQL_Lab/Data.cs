@@ -374,5 +374,75 @@ namespace PostgreSQL_Lab
             Console.WriteLine("\n\nPress any key...");
             Console.ReadKey();
         }    
+    
+        public static void FullTextSearchWord(){
+            ReturnAll();
+            string text = "", command = "";
+                    Console.WriteLine("Слово не входить:");
+                    try
+                    {
+                        Console.Write("Слово: ");
+                        text = Convert.ToString(Console.ReadLine());
+                    }
+                    catch (FormatException f)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(f.Message);
+                        Console.ResetColor();
+                        Console.ReadKey();
+                    }
+
+                    command = String.Format("select products.* FROM products WHERE to_tsvector(products.description) @@ to_tsquery('!{0}')", text);
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        conn.Open();
+                        using (var cmd = new NpgsqlCommand(command, conn))
+                        using (var reader = cmd.ExecuteReader())
+                            while (reader.Read())
+                            {
+                                Console.Write("ID: " + reader.GetValue(0));
+                                Console.Write("\tdesignation: " + reader.GetString(1));
+                                Console.Write("\tdescription: " + reader.GetString(2));
+                                Console.Write("\tailable: " + reader.GetBoolean(3));
+                                Console.WriteLine();
+                            }
+                        conn.Close();
+                    }
+        }
+
+        public static void FullTextSearchPhrase(){
+            ReturnAll();
+            string text = "", command = "";
+            Console.WriteLine("Входить цiла фраза");
+            try
+            {
+                Console.Write("Фраза: ");
+                text = Convert.ToString(Console.ReadLine());
+            }
+            catch (FormatException f)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(f.Message);
+                Console.ResetColor();
+                Console.ReadKey();
+            }
+            text = text.Replace(" ", " <-> ");
+            command = String.Format("select products.* FROM products WHERE to_tsvector(products.description) @@ to_tsquery('{0}')", text);
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand(command, conn))
+                using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        Console.Write("ID: " + reader.GetValue(0));
+                        Console.Write("\tdesignation: " + reader.GetString(1));
+                        Console.Write("\tdescription: " + reader.GetString(2));
+                        Console.Write("\tailable: " + reader.GetBoolean(3));
+                        Console.WriteLine();
+                    }
+                conn.Close();
+            }
+        }
     }
 }

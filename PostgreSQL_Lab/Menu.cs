@@ -13,7 +13,7 @@ namespace PostgreSQL_Lab
                 "Insert",
                 "Update",
                 "Delete",
-                "Search",
+                "Search by attributes",
                 "Full text search",
                 "Get all",
                 "Get by PK",
@@ -23,6 +23,12 @@ namespace PostgreSQL_Lab
         private static readonly List<string> insertMenuItems = new List<string>() { 
                 "Random",
                 "Console",
+                "Back"
+        };
+
+        private static readonly List<string> fullSearchItems = new List<string>() {
+                "Word",
+                "Phrase",
                 "Back"
         };
 
@@ -52,10 +58,10 @@ namespace PostgreSQL_Lab
                         Data.DeleteData();
                         break;
                     case 3:
-                        Console.WriteLine("Search");
+                        
                         break;
                     case 4:
-                        Console.WriteLine("Full text search");
+                        SearchMenu();
                         break;
                     case 5:
                         Data.ReturnAll();
@@ -70,7 +76,31 @@ namespace PostgreSQL_Lab
             }
         }
 
-        private void DrawMenu(List<string> items)
+        private static void SearchMenu(){
+            bool existMenu = true;
+            index = 0;
+            while (existMenu)
+            {
+                Console.CursorVisible = false;
+                DrawMenu(fullSearchItems);
+                int selectedMenu = SelectedMenu(fullSearchItems.Count);
+                switch (selectedMenu)
+                {
+                    case 0:
+                        Data.FullTextSearchWord();
+                        break;
+                    case 1:      
+                        Data.FullTextSearchPhrase();
+                        break;
+                    case 2:
+                        Console.WriteLine("Back");
+                        existMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private static void DrawMenu(List<string> items)
         {
             Console.WriteLine("\n\n\t\tMenu:");
             for (int i = 0; i < items.Count; i++)
@@ -90,7 +120,7 @@ namespace PostgreSQL_Lab
             }
         }
 
-        private int SelectedMenu(int count){
+        private static int SelectedMenu(int count){
             ConsoleKeyInfo ckey = Console.ReadKey();
             if (ckey.Key == ConsoleKey.DownArrow && index != count - 1)
                 index++;
@@ -108,6 +138,7 @@ namespace PostgreSQL_Lab
         
         private void InsertMenu(){
             bool existMenu = true;
+            index = 0;
             while (existMenu)
             {
                 Console.CursorVisible = false;
